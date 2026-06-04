@@ -30,14 +30,16 @@ export function AboutStage() {
     return () => observer.disconnect();
   }, []);
 
+  const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
   const slide = (delay: number) => ({
     animate: visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
-    transition: { delay, duration: 0.75, ease: [0.16, 1, 0.3, 1] },
+    transition: { delay, duration: 0.75, ease },
   });
 
   const rule = (delay: number) => ({
     animate: visible ? { scaleX: 1 } : { scaleX: 0 },
-    transition: { delay, duration: 0.9, ease: [0.16, 1, 0.3, 1] },
+    transition: { delay, duration: 0.9, ease },
   });
 
   return (
@@ -60,7 +62,7 @@ export function AboutStage() {
         <div className="overflow-hidden">
           <motion.h2
             animate={visible ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
-            transition={{ delay: 0.18, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.18, duration: 0.8, ease: ease }}
             className="font-black leading-[0.92] tracking-tight text-white"
             style={{ fontSize: "clamp(2.4rem, 6.8vw, 6.5rem)" }}
           >
@@ -70,7 +72,7 @@ export function AboutStage() {
         <div className="overflow-hidden">
           <motion.h2
             animate={visible ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
-            transition={{ delay: 0.26, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.26, duration: 0.8, ease: ease }}
             className="font-black leading-[0.92] tracking-tight"
             style={{
               fontSize: "clamp(2.4rem, 6.8vw, 6.5rem)",
