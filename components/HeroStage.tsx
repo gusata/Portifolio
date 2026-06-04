@@ -3,7 +3,7 @@
 import { CSSProperties, useEffect, useRef, useState } from "react";
 
 const englishTitle =
-  "Criando sistemas, experiências e modelos que elevam o que a tecnologia pode fazer.";
+  "Building systems, experiences and models that elevate what technology can do.";
 const japaneseTitle =
   "テクノロジーの可能性を引き上げるシステム、エクスペリエンス、そしてモデルを創り出す。";
 type SakuraPetal = {
@@ -20,12 +20,13 @@ type CSSVarStyle = CSSProperties & Record<string, string | number>;
 
 export function HeroStage() {
   const glowRef = useRef<HTMLDivElement>(null);
+  const titlePtRef = useRef<HTMLSpanElement>(null);
+  const titleJpRef = useRef<HTMLSpanElement>(null);
   const timeoutsRef = useRef<number[]>([]);
   const petalTimeoutsRef = useRef<number[]>([]);
   const languageRef = useRef<"pt" | "jp">("pt");
+  const branchCooldown = useRef(false);
 
-  const [titlePt, setTitlePt] = useState(englishTitle);
-  const [titleJp, setTitleJp] = useState("");
   const [petals, setPetals] = useState<SakuraPetal[]>([]);
   const [showHint, setShowHint] = useState(true);
 
@@ -53,8 +54,8 @@ export function HeroStage() {
   const swapTexts = (
     outgoingFull: string,
     incomingFull: string,
-    outgoingSetter: (value: string) => void,
-    incomingSetter: (value: string) => void,
+    outgoingEl: HTMLSpanElement | null,
+    incomingEl: HTMLSpanElement | null,
     opts?: { delay?: number },
   ) => {
     const step = 5;
@@ -63,13 +64,13 @@ export function HeroStage() {
     for (let i = 0; i < chars.length; i += 1) {
       const timeout = window.setTimeout(() => {
         chars[i] = "\u00A0";
-        outgoingSetter(chars.join(""));
+        if (outgoingEl) outgoingEl.textContent = chars.join("");
       }, delay + i * step);
       timeoutsRef.current.push(timeout);
     }
     for (let i = 0; i <= incomingFull.length; i += 1) {
       const timeout = window.setTimeout(() => {
-        incomingSetter(incomingFull.slice(0, i));
+        if (incomingEl) incomingEl.textContent = incomingFull.slice(0, i);
       }, delay + i * step);
       timeoutsRef.current.push(timeout);
     }
@@ -79,9 +80,9 @@ export function HeroStage() {
     timeoutsRef.current.forEach((timeout) => window.clearTimeout(timeout));
     timeoutsRef.current = [];
     if (target === "jp") {
-      swapTexts(englishTitle, japaneseTitle, setTitlePt, setTitleJp);
+      swapTexts(englishTitle, japaneseTitle, titlePtRef.current, titleJpRef.current);
     } else {
-      swapTexts(japaneseTitle, englishTitle, setTitleJp, setTitlePt);
+      swapTexts(japaneseTitle, englishTitle, titleJpRef.current, titlePtRef.current);
     }
     languageRef.current = target;
   };
@@ -97,7 +98,13 @@ export function HeroStage() {
   };
 
   const handleBranchClick = () => {
-    const batch = Array.from({ length: 160 }, (_, index) => ({
+    if (branchCooldown.current) return;
+    branchCooldown.current = true;
+
+    petalTimeoutsRef.current.forEach((t) => window.clearTimeout(t));
+    petalTimeoutsRef.current = [];
+
+    const batch = Array.from({ length: 80 }, (_, index) => ({
       id: `${Date.now()}-${index}`,
       left: Math.random() * 100,
       top: -80 + Math.random() * 80,
@@ -106,21 +113,37 @@ export function HeroStage() {
       duration: 5.2 + Math.random() * 3,
       scale: 0.5 + Math.random() * 0.7,
     }));
-    setPetals((prev) => [...prev, ...batch]);
-    const ids = new Set(batch.map((petal) => petal.id));
-    const timeout = window.setTimeout(() => {
-      setPetals((prev) => prev.filter((petal) => !ids.has(petal.id)));
+
+    setPetals(batch);
+
+    const cooldown = window.setTimeout(() => {
+      branchCooldown.current = false;
+    }, 7500);
+    petalTimeoutsRef.current.push(cooldown);
+
+    const cleanup = window.setTimeout(() => {
+      setPetals([]);
     }, 9500);
-    petalTimeoutsRef.current.push(timeout);
+    petalTimeoutsRef.current.push(cleanup);
+
     if (showHint) setShowHint(false);
   };
 
   return (
     <section
       id="hero"
-      className="snap-none relative flex h-screen flex-col justify-center px-6 py-10 text-[var(--foreground)] sm:px-10 lg:px-16"
+      className="snap-none relative flex h-screen flex-col justify-center overflow-hidden px-6 py-10 text-[var(--foreground)] sm:px-10 lg:px-16"
     >
       <div className="pointer-events-none absolute inset-0 z-10">
+        <svg style={{ position: "absolute", width: 0, height: 0 }}>
+          <defs>
+            <linearGradient id="petal-fill" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ffd9eb" />
+              <stop offset="60%" stopColor="#f78ab3" />
+              <stop offset="100%" stopColor="#f04d84" />
+            </linearGradient>
+          </defs>
+        </svg>
         {petals.map((petal) => {
           const style: CSSVarStyle = {
             left: `${petal.left}%`,
@@ -138,13 +161,6 @@ export function HeroStage() {
               viewBox="0 0 40 60"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <defs>
-                <linearGradient id="petal-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#ffd9eb" />
-                  <stop offset="60%" stopColor="#f78ab3" />
-                  <stop offset="100%" stopColor="#f04d84" />
-                </linearGradient>
-              </defs>
               <path
                 d="M20 5 C9 18 6 32 14 47 C19 56 22 56 27 47 C34 35 32 18 20 5 Z"
                 fill="url(#petal-fill)"
@@ -170,7 +186,7 @@ export function HeroStage() {
       <button
         type="button"
         onClick={handleBranchClick}
-        aria-label="Liberar pétalas de sakura"
+        aria-label="Release sakura petals"
         className="group absolute right-0 top-24 z-50 flex flex-col items-end text-[var(--muted)] drop-shadow-[0_12px_30px_rgba(0,0,0,0.55)]"
       >
         <div className="flex items-center">
@@ -261,8 +277,8 @@ export function HeroStage() {
             onMouseEnter={handleHover}
             onMouseLeave={handleLeave}
           >
-            <span className="block text-[var(--foreground)]">{titlePt}</span>
-            <span className="pointer-events-none absolute inset-0 text-(--accent)/70">{titleJp}</span>
+            <span ref={titlePtRef} className="block text-[var(--foreground)]">{englishTitle}</span>
+            <span ref={titleJpRef} className="pointer-events-none absolute inset-0 text-(--accent)/70" />
           </div>
         </div>
       </div>

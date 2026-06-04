@@ -3,10 +3,10 @@
 import { MouseEvent, useEffect, useState } from "react";
 
 const navItems = [
-  { label: "Início", href: "#hero" },
-  { label: "Sobre", href: "#about" },
-  { label: "Projetos", href: "#projects" },
-  { label: "Contato", href: "#contact" },
+  { label: "Home", href: "#hero" },
+  { label: "About", href: "#about" },
+  { label: "Projects", href: "#projects" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export function Navbar() {
@@ -63,7 +63,7 @@ export function Navbar() {
           onClick={(event) => navigate(event, "#contact")}
           className="rounded-full border border-[var(--stroke)] px-3 py-1 text-[var(--foreground)] transition hover:bg-[var(--accent)] hover:text-[var(--ink)]"
         >
-          Vamos criar
+          Let's talk
         </a>
       </nav>
     </header>
