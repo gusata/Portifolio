@@ -1,0 +1,22 @@
+{
+  "skiper52": {
+    "registry": "https://skiper-ui.com/r/skiper52.json",
+    "sha256": "2d20985703d1ca8f2505d55eac47d16692bd52a02d6169663d5dcaf01b2bc87b",
+    "dependencies": [
+      "framer-motion"
+    ]
+  },
+  "skiper47": {
+    "registry": "https://skiper-ui.com/r/skiper47.json",
+    "sha256": "e7514f1ec0d9dd479852dd20f584257c82020344f4c561163eac98593ba46bac",
+    "dependencies": [
+      "swiper",
+      "framer-motion"
+    ]
+  },
+  "skiper63": {
+    "registry": "https://skiper-ui.com/r/skiper63.json",
+    "sha256": "c3051bf9177d896ac1789ccaa5fe6e30dddb5104e0384695df123aefed098927",
+    "adaptation": "Static filter only; demo and its icon dependencies omitted."
+  }
+}

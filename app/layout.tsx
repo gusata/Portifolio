@@ -1,40 +1,43 @@
 import type { Metadata } from "next";
-import { Dela_Gothic_One, Geist, Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import "./developer.css";
+import "./photography.css";
+import "./photography-editorial.css";
+import "./photography-room.css";
+import "./photography-grid.css";
+import "./typography.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const dualitySans = localFont({
+  src: "../public/fonts/archivo-latin.woff2",
+  variable: "--font-archivo",
+  weight: "400 800",
+  display: "swap",
 });
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const annotations = localFont({
+  src: "../public/fonts/jetbrains-mono-latin.woff2",
+  variable: "--font-annotations",
+  weight: "400 500",
+  display: "swap",
 });
-
-const delaGothic = Dela_Gothic_One({
-  variable: "--font-gothic",
-  subsets: ["latin"],
-  weight: "400",
+const photographic = localFont({
+  src: "../public/fonts/newsreader-italic-latin.woff2",
+  variable: "--font-photographic",
+  weight: "400 500",
+  style: "italic",
+  display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {
-  title: "Gustavo Galeazzi — Full Stack & AI Builder",
-  description: "Portfolio of Gustavo Galeazzi — Full Stack Developer and AI Builder based in São Paulo, Brazil.",
+  title: "Gustavo Galeazzi — Two Worlds",
+  description: "Two disciplines. One creative mind. Explore Gustavo Galeazzi as developer and photographer.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${delaGothic.variable} antialiased`}
-      >
-        {children}
-      </body>
+    <html lang="en" className={`${dualitySans.variable} ${annotations.variable} ${photographic.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

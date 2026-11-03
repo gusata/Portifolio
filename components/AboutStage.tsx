@@ -1,161 +1,156 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { useLanguage } from "@/components/LanguageProvider";
 
 const stack = [
-  "Python", "TypeScript", "Django", "React",
-  "Next.js", "React Native", "OCR", "AI / ML",
-];
-
-const focuses = [
-  { label: "Full Stack Development" },
-  { label: "AI / ML & Machine Learning" },
-  { label: "OCR & Computer Vision" },
+  "Python",
+  "TypeScript",
+  "Django",
+  "React",
+  "Next.js",
+  "React Native",
+  "OCR",
+  "AI / ML",
 ];
 
 export function AboutStage() {
+  const { language, copy } = useLanguage();
   const [visible, setVisible] = useState(false);
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const container = document.querySelector(".scroll-container");
     const section = ref.current;
-    if (!container || !section) return;
+    if (!section) return;
+
     const observer = new IntersectionObserver(
-      (entries) => { if (entries[0]?.isIntersecting) setVisible(true); },
-      { root: container, threshold: 0.2 },
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisible(true);
+          observer.unobserve(section);
+        }
+      },
+      { threshold: 0.15 },
     );
+
     observer.observe(section);
     return () => observer.disconnect();
   }, []);
 
   const ease = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
-  const slide = (delay: number) => ({
-    animate: visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
-    transition: { delay, duration: 0.75, ease },
-  });
-
-  const rule = (delay: number) => ({
-    animate: visible ? { scaleX: 1 } : { scaleX: 0 },
-    transition: { delay, duration: 0.9, ease },
-  });
-
   return (
     <section
       ref={ref}
       id="about"
-      className="relative flex h-screen flex-col bg-[#050505] px-6 py-12 text-[var(--foreground)] sm:px-10 lg:px-16"
+      lang={language === "jp" ? "ja" : language}
+      className="about-stage relative flex min-h-screen flex-col justify-between overflow-hidden bg-[#08090b] px-6 pb-8 pt-24 text-[var(--foreground)] sm:px-10 lg:h-screen lg:min-h-[800px] lg:px-16 lg:pb-10 lg:pt-24"
     >
-      {/* ── Header ── */}
-      <motion.div {...slide(0)} className="flex shrink-0 items-center justify-between">
-        <p className="text-[10px] uppercase tracking-[0.65em] text-[var(--muted)]/50">About</p>
-        <p className="font-mono text-[10px] text-[var(--muted)]/28">Gustavo Galeazzi</p>
-      </motion.div>
-
-      {/* Separator */}
-      <motion.div {...rule(0.08)} className="my-8 h-px origin-left bg-white/[0.06]" />
-
-      {/* ── Headline — vertically centered in remaining space ── */}
-      <div className="flex flex-1 flex-col justify-center">
-        <div className="overflow-hidden">
-          <motion.h2
-            animate={visible ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
-            transition={{ delay: 0.18, duration: 0.8, ease: ease }}
-            className="font-black leading-[0.92] tracking-tight text-white"
-            style={{ fontSize: "clamp(2.4rem, 6.8vw, 6.5rem)" }}
-          >
-            Full Stack Developer
-          </motion.h2>
-        </div>
-        <div className="overflow-hidden">
-          <motion.h2
-            animate={visible ? { y: 0, opacity: 1 } : { y: "100%", opacity: 0 }}
-            transition={{ delay: 0.26, duration: 0.8, ease: ease }}
-            className="font-black leading-[0.92] tracking-tight"
-            style={{
-              fontSize: "clamp(2.4rem, 6.8vw, 6.5rem)",
-              color: "rgba(247,245,239,0.28)",
-            }}
-          >
-            & AI Builder.
-          </motion.h2>
-        </div>
+      <div className="about-kanji pointer-events-none absolute -right-8 top-28 select-none text-[18rem] font-black leading-none text-white/[0.018] lg:right-[31%] lg:top-16 lg:text-[24rem]" aria-hidden="true">
+        創
       </div>
 
-      {/* Separator */}
-      <motion.div {...rule(0.3)} className="my-8 h-px origin-left bg-white/[0.06]" />
+      <header className="relative z-10 flex items-center justify-between border-b border-white/10 pb-5">
+        <p className="text-[10px] uppercase tracking-[0.65em] text-[var(--muted)]/70">
+          {copy.about.section}
+        </p>
+        <p className="font-mono text-[10px] tracking-[0.14em] text-[var(--muted)]/40">
+          {copy.about.location}
+        </p>
+      </header>
 
-      {/* ── Bio + Skills ── */}
-      <motion.div
-        {...slide(0.38)}
-        className="flex shrink-0 flex-col gap-8 lg:flex-row lg:items-start lg:gap-16"
-      >
-        {/* Bio */}
-        <div className="lg:w-1/2">
-          <p className="text-[0.95rem] leading-relaxed text-[var(--foreground)]/72">
-            Programming since childhood. Graduated as a Systems technician
-            at ETEC in 2023, went deeper at FATEC. Currently Junior Developer
-            at Grupo DirectWeb — hands-on with AI and Python from my time at Tecnogera.
+      <div className="relative z-10 grid flex-1 items-center gap-12 py-10 lg:grid-cols-[1.12fr_0.88fr] lg:gap-16 lg:py-8">
+        <motion.div
+          initial={false}
+          animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 22 }}
+          transition={{ duration: 0.72, ease }}
+          className="about-copy flex flex-col justify-center"
+        >
+          <p className="mb-5 text-[10px] uppercase tracking-[0.52em] text-[var(--accent-alt)]/75">
+            {copy.about.eyebrow}
           </p>
-          <p className="mt-3 text-[0.85rem] leading-relaxed text-[var(--foreground)]/40">
-            I work across the full stack with a product mindset, combining engineering
-            precision and design sensibility. Especially driven by AI — building
-            and refining models that solve real-world problems, from OCR pipelines
-            to production-grade APIs.
-          </p>
-        </div>
+          <h2 className="about-heading-scroll max-w-4xl font-black leading-[0.86] tracking-[-0.065em] text-white" style={{ fontSize: "clamp(3.25rem, 7.3vw, 7.25rem)" }}>
+            {copy.about.headingOne}
+            <br />
+            {copy.about.headingTwo}
+            <span className="block pt-2 text-white/38">{copy.about.headingThree}</span>
+          </h2>
 
-        {/* Skills */}
-        <div className="flex gap-12 lg:w-1/2">
-          <div>
-            <p className="mb-3 text-[9px] uppercase tracking-[0.55em] text-[var(--muted)]/38">
-              Stack
+          <div className="mt-8 grid gap-5 border-l border-[var(--accent)]/55 pl-5 sm:grid-cols-2 sm:gap-8">
+            <p className="text-sm leading-relaxed text-white/72">
+              {copy.about.paragraphOne}
             </p>
-            <div className="flex flex-col gap-[5px]">
-              {stack.map((s) => (
-                <span key={s} className="text-[0.82rem] text-[var(--foreground)]/48">
-                  {s}
-                </span>
-              ))}
-            </div>
+            <p className="text-sm leading-relaxed text-white/42">
+              {copy.about.paragraphTwo}
+            </p>
           </div>
 
-          <div>
-            <p className="mb-3 text-[9px] uppercase tracking-[0.55em] text-[var(--muted)]/38">
-              Focus
-            </p>
-            <div className="flex flex-col gap-[5px]">
-              {focuses.map((f) => (
-                <span key={f.label} className="text-[0.82rem] text-[var(--foreground)]/48">
-                  {f.label}
+          <div className="mt-8 flex items-center gap-3 text-[10px] uppercase tracking-[0.3em] text-white/45">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+            {copy.about.role}
+          </div>
+        </motion.div>
+
+        <motion.figure
+          initial={false}
+          animate={visible ? { opacity: 1, y: 0, rotate: 0 } : { opacity: 0, y: 22, rotate: 1.5 }}
+          transition={{ duration: 0.85, delay: 0.12, ease }}
+          className="about-art group relative mx-auto w-full max-w-[470px]"
+        >
+          <div className="about-art-frame relative aspect-[4/3] overflow-hidden border border-white/10 bg-[#10151a] lg:aspect-[4/5]">
+            <div className="about-image-parallax">
+              <Image
+                src="/about-placeholder.png"
+                alt={copy.about.imageAlt}
+                fill
+                sizes="(max-width: 1023px) 90vw, 38vw"
+                quality={75}
+                className="about-art-image object-cover"
+              />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#08090b]/90 via-transparent to-[#08090b]/10" />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5 sm:p-6">
+              <figcaption>
+                <span className="mb-2 block font-mono text-[9px] tracking-[0.25em] text-[var(--accent-alt)]">
+                  35°41&apos; N · 139°41&apos; E
                 </span>
-              ))}
+                <span className="text-sm font-medium tracking-wide text-white/85">
+                  {copy.about.imageCaption}
+                </span>
+              </figcaption>
+              <span className="grid h-11 w-11 place-items-center border border-white/30 font-mono text-[10px] text-white/75 transition-colors duration-300 group-hover:border-[var(--accent)] group-hover:text-[var(--accent-alt)]">
+                技術
+              </span>
             </div>
           </div>
-        </div>
-      </motion.div>
+          <span className="about-art-index absolute -left-3 -top-3 z-10 grid h-12 w-12 place-items-center bg-[var(--accent)] font-mono text-[10px] text-white shadow-[0_8px_30px_rgba(244,81,30,0.24)]">
+            02
+          </span>
+          <span className="absolute -right-4 top-1/3 hidden text-[9px] uppercase tracking-[0.4em] text-white/35 [writing-mode:vertical-rl] lg:block">
+            人工知能と創造
+          </span>
+        </motion.figure>
+      </div>
 
-      {/* Separator */}
-      <motion.div {...rule(0.44)} className="my-8 h-px origin-left bg-white/[0.06]" />
-
-      {/* ── Footer strip ── */}
-      <motion.div
-        {...slide(0.5)}
-        className="flex shrink-0 items-center justify-between"
-      >
-        <p className="text-[0.78rem] text-[var(--muted)]/35">São Paulo, Brasil</p>
-        <div className="flex items-center gap-2">
-          <span
-            className="h-[6px] w-[6px] rounded-full bg-[var(--accent)]"
-            style={{ animation: "pulse 2s ease-in-out infinite" }}
-          />
-          <p className="text-[0.78rem] text-[var(--muted)]/35">
-            Dev Jr · Grupo DirectWeb
-          </p>
+      <footer className="relative z-10 border-t border-white/10 pt-5">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <p className="text-[9px] uppercase tracking-[0.55em] text-white/40">{copy.about.tools}</p>
+          <p className="hidden font-mono text-[9px] tracking-[0.2em] text-white/25 sm:block">STACK / 08</p>
         </div>
-      </motion.div>
+        <div className="flex flex-wrap gap-2">
+          {stack.map((skill, index) => (
+            <span
+              key={skill}
+              className="about-skill border border-white/10 px-3 py-2 font-mono text-[10px] text-white/55 transition-colors duration-200 hover:border-[var(--accent)]/55 hover:text-white"
+              style={{ transitionDelay: `${index * 20}ms` }}
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      </footer>
     </section>
   );
 }

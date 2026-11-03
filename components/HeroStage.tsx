@@ -1,287 +1,249 @@
-"use client";
+﻿"use client";
 
+import Image from "next/image";
 import { CSSProperties, useEffect, useRef, useState } from "react";
+import { languageOptions, useLanguage } from "@/components/LanguageProvider";
 
-const englishTitle =
-  "Building systems, experiences and models that elevate what technology can do.";
-const japaneseTitle =
-  "テクノロジーの可能性を引き上げるシステム、エクスペリエンス、そしてモデルを創り出す。";
-type SakuraPetal = {
-  id: string;
+type Petal = {
+  id: number;
   left: number;
-  top: number;
   drift: number;
   delay: number;
   duration: number;
   scale: number;
 };
 
-type CSSVarStyle = CSSProperties & Record<string, string | number>;
+type PetalStyle = CSSProperties & Record<"--drift" | "--fall-delay" | "--fall-duration" | "--scale", string>;
 
 export function HeroStage() {
+  const { language, setLanguage, copy } = useLanguage();
+  const heroRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const titlePtRef = useRef<HTMLSpanElement>(null);
-  const titleJpRef = useRef<HTMLSpanElement>(null);
-  const timeoutsRef = useRef<number[]>([]);
-  const petalTimeoutsRef = useRef<number[]>([]);
-  const languageRef = useRef<"pt" | "jp">("pt");
-  const branchCooldown = useRef(false);
-
-  const [petals, setPetals] = useState<SakuraPetal[]>([]);
-  const [showHint, setShowHint] = useState(true);
+  const glowFrame = useRef<number>(0);
+  const introTimeout = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+  const [petals, setPetals] = useState<Petal[]>([]);
+  const [showIntro, setShowIntro] = useState(true);
 
   useEffect(() => {
-    const element = glowRef.current;
-    if (!element) return;
-    const handlePointer = (event: PointerEvent) => {
-      const { innerWidth, innerHeight } = window;
-      const normX = event.clientX / innerWidth;
-      const normY = event.clientY / innerHeight;
-      element.style.setProperty("--x", `${normX * 100}%`);
-      element.style.setProperty("--y", `${normY * 100}%`);
+    const hero = heroRef.current;
+    const glow = glowRef.current;
+    if (!hero || !glow) return;
+
+    const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (!finePointer) return;
+
+    const handlePointerMove = (event: PointerEvent) => {
+      cancelAnimationFrame(glowFrame.current);
+      const x = event.clientX - 280;
+      const y = event.clientY - 280;
+      glowFrame.current = requestAnimationFrame(() => {
+        glow.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      });
     };
-    window.addEventListener("pointermove", handlePointer);
-    return () => window.removeEventListener("pointermove", handlePointer);
-  }, []);
 
-  useEffect(() => {
+    hero.addEventListener("pointermove", handlePointerMove, { passive: true });
     return () => {
-      timeoutsRef.current.forEach((timeout) => window.clearTimeout(timeout));
-      petalTimeoutsRef.current.forEach((timeout) => window.clearTimeout(timeout));
+      hero.removeEventListener("pointermove", handlePointerMove);
+      cancelAnimationFrame(glowFrame.current);
     };
   }, []);
 
-  const swapTexts = (
-    outgoingFull: string,
-    incomingFull: string,
-    outgoingEl: HTMLSpanElement | null,
-    incomingEl: HTMLSpanElement | null,
-    opts?: { delay?: number },
-  ) => {
-    const step = 5;
-    const delay = opts?.delay ?? 3;
-    const chars = outgoingFull.split("");
-    for (let i = 0; i < chars.length; i += 1) {
-      const timeout = window.setTimeout(() => {
-        chars[i] = "\u00A0";
-        if (outgoingEl) outgoingEl.textContent = chars.join("");
-      }, delay + i * step);
-      timeoutsRef.current.push(timeout);
-    }
-    for (let i = 0; i <= incomingFull.length; i += 1) {
-      const timeout = window.setTimeout(() => {
-        if (incomingEl) incomingEl.textContent = incomingFull.slice(0, i);
-      }, delay + i * step);
-      timeoutsRef.current.push(timeout);
-    }
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    introTimeout.current = window.setTimeout(() => setShowIntro(false), 2860);
+    return () => {
+      if (introTimeout.current !== null) window.clearTimeout(introTimeout.current);
+    };
+  }, []);
+
+  useEffect(() => () => {
+    cancelAnimationFrame(glowFrame.current);
+    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+  }, []);
+
+  const skipIntro = () => {
+    if (introTimeout.current !== null) window.clearTimeout(introTimeout.current);
+    setShowIntro(false);
   };
 
-  const animateLanguage = (target: "pt" | "jp") => {
-    timeoutsRef.current.forEach((timeout) => window.clearTimeout(timeout));
-    timeoutsRef.current = [];
-    if (target === "jp") {
-      swapTexts(englishTitle, japaneseTitle, titlePtRef.current, titleJpRef.current);
-    } else {
-      swapTexts(japaneseTitle, englishTitle, titleJpRef.current, titlePtRef.current);
-    }
-    languageRef.current = target;
-  };
-
-  const handleHover = () => {
-    if (languageRef.current === "jp") return;
-    animateLanguage("jp");
-  };
-
-  const handleLeave = () => {
-    if (languageRef.current === "pt") return;
-    animateLanguage("pt");
-  };
-
-  const handleBranchClick = () => {
-    if (branchCooldown.current) return;
-    branchCooldown.current = true;
-
-    petalTimeoutsRef.current.forEach((t) => window.clearTimeout(t));
-    petalTimeoutsRef.current = [];
-
-    const batch = Array.from({ length: 80 }, (_, index) => ({
-      id: `${Date.now()}-${index}`,
-      left: Math.random() * 100,
-      top: -80 + Math.random() * 80,
-      drift: Math.random() * 240 - 120,
-      delay: Math.random() * 0.3,
-      duration: 5.2 + Math.random() * 3,
-      scale: 0.5 + Math.random() * 0.7,
+  const releasePetals = () => {
+    if (petals.length > 0) return;
+    const nextPetals = Array.from({ length: 20 }, (_, index) => ({
+      id: Date.now() + index,
+      left: 8 + Math.random() * 84,
+      drift: Math.random() * 220 - 110,
+      delay: Math.random() * 0.7,
+      duration: 4.4 + Math.random() * 2.2,
+      scale: 0.55 + Math.random() * 0.65,
     }));
-
-    setPetals(batch);
-
-    const cooldown = window.setTimeout(() => {
-      branchCooldown.current = false;
-    }, 7500);
-    petalTimeoutsRef.current.push(cooldown);
-
-    const cleanup = window.setTimeout(() => {
-      setPetals([]);
-    }, 9500);
-    petalTimeoutsRef.current.push(cleanup);
-
-    if (showHint) setShowHint(false);
+    setPetals(nextPetals);
+    timeoutRef.current = window.setTimeout(() => setPetals([]), 7200);
   };
 
   return (
     <section
+      ref={heroRef}
       id="hero"
-      className="snap-none relative flex h-screen flex-col justify-center overflow-hidden px-6 py-10 text-[var(--foreground)] sm:px-10 lg:px-16"
+      className="hero-stage relative flex min-h-[820px] flex-col justify-center overflow-hidden px-6 pb-24 pt-32 text-[var(--foreground)] sm:px-10 lg:min-h-[100svh] lg:px-16 lg:pb-28 lg:pt-28"
     >
-      <div className="pointer-events-none absolute inset-0 z-10">
-        <svg style={{ position: "absolute", width: 0, height: 0 }}>
-          <defs>
-            <linearGradient id="petal-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ffd9eb" />
-              <stop offset="60%" stopColor="#f78ab3" />
-              <stop offset="100%" stopColor="#f04d84" />
-            </linearGradient>
-          </defs>
-        </svg>
-        {petals.map((petal) => {
-          const style: CSSVarStyle = {
-            left: `${petal.left}%`,
-            top: `${petal.top}%`,
-            "--drift": `${petal.drift}px`,
-            "--scale": petal.scale,
-            "--fall-duration": `${petal.duration}s`,
-            "--fall-delay": `${petal.delay}s`,
-          };
-          return (
-            <svg
-              key={petal.id}
-              className="sakura-petal"
-              style={style}
-              viewBox="0 0 40 60"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M20 5 C9 18 6 32 14 47 C19 56 22 56 27 47 C34 35 32 18 20 5 Z"
-                fill="url(#petal-fill)"
-                stroke="#ffddea"
-                strokeWidth="1"
-              />
-              <path
-                d="M20 5 C14 17 15 30 21 43 C23 48 26 48 28 43 C30 34 27 21 20 5 Z"
-                fill="rgba(255,255,255,0.35)"
-              />
-            </svg>
-          );
-        })}
+      <div className="hero-image-parallax absolute inset-0" aria-hidden="true">
+        <Image
+          src="/kyoto-portfolio-hero-v1.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          quality={75}
+          className="hero-backdrop"
+        />
       </div>
-      <div
-        ref={glowRef}
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(circle at var(--x,50%) var(--y,50%), rgba(244,81,30,0.2), transparent 35%)",
-        }}
-      />
-      <button
-        type="button"
-        onClick={handleBranchClick}
-        aria-label="Release sakura petals"
-        className="group absolute right-0 top-24 z-50 flex flex-col items-end text-[var(--muted)] drop-shadow-[0_12px_30px_rgba(0,0,0,0.55)]"
-      >
-        <div className="flex items-center">
+      <div className="hero-image-shade pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="hero-glow pointer-events-none absolute -z-0" ref={glowRef} aria-hidden="true" />
+
+      {petals.length > 0 && (
+        <div className="pointer-events-none absolute inset-0 z-30 overflow-hidden" aria-hidden="true">
+          {petals.map((petal) => {
+            const style: PetalStyle = {
+              left: `${petal.left}%`,
+              "--drift": `${petal.drift}px`,
+              "--fall-delay": `${petal.delay}s`,
+              "--fall-duration": `${petal.duration}s`,
+              "--scale": `${petal.scale}`,
+            };
+            return <span className="sakura-petal" key={petal.id} style={style} />;
+          })}
         </div>
-        <svg
-          viewBox="0 0 400 160"
-          className="w-72 text-[var(--muted)] right-[-30px] relative transition group-hover:text-[var(--accent)]"
-          style={{ transform: "rotate(-20deg)" }}
+      )}
+
+      <div className="hero-topline absolute inset-x-6 z-20 flex items-center justify-between sm:inset-x-10 lg:inset-x-16">
+        <p className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.3em] text-white/55 sm:text-[10px]">
+          <span className="hero-live-dot" aria-hidden="true" />
+          {copy.hero.kicker}
+        </p>
+        <button
+          type="button"
+          onClick={releasePetals}
+          className="hero-sakura group inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.24em] text-white/55 transition-colors hover:text-white"
+          aria-label={copy.hero.sakuraLabel}
         >
-          <defs>
-            <linearGradient id="branch-petal-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ffe9f5" />
-              <stop offset="55%" stopColor="#fbb0cf" />
-              <stop offset="100%" stopColor="#f07da4" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M15 120 Q120 60 210 85 T380 55"
-            stroke="#482418"
-            strokeWidth="16"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M90 92 Q140 68 180 76"
-            stroke="#482418"
-            strokeWidth="10"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M130 108 Q150 88 198 90"
-            stroke="#482418"
-            strokeWidth="8"
-            strokeLinecap="round"
-            fill="none"
-          />
-          <path
-            d="M240 90 Q280 74 330 80"
-            stroke="#482418"
-            strokeWidth="10"
-            strokeLinecap="round"
-            fill="none"
-          />
-          {[{ x: 60, y: 100, s: 0.6 }, { x: 120, y: 85, s: 0.55 }, { x: 180, y: 100, s: 0.62 }, { x: 230, y: 90, s: 0.6 }, { x: 285, y: 76, s: 0.58 }, { x: 335, y: 82, s: 0.5 }].map((flower) => (
-            <g key={`${flower.x}-${flower.y}`} transform={`translate(${flower.x} ${flower.y}) scale(${flower.s})`}>
-              {[0, 72, 144, 216, 288].map((angle) => (
-                <path
-                  key={angle}
-                  d="M0 0 C-16 -6 -26 -4 -28 6 C-22 18 -6 22 0 20 Z"
-                  fill="url(#branch-petal-fill)"
-                  transform={`rotate(${angle})`}
-                />
-              ))}
-              <circle r="6" fill="#4d0d28" />
-              {[0, 36, 72, 108, 144].map((angle) => (
-                <line
-                  key={angle}
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="-14"
-                  stroke="#4d0d28"
-                  strokeWidth="1.5"
-                  transform={`rotate(${angle})`}
-                />
-              ))}
-            </g>
-          ))}
-          {[{ x: 90, y: 110 }, { x: 145, y: 94 }, { x: 205, y: 108 }, { x: 255, y: 88 }, { x: 320, y: 98 }, { x: 355, y: 70 }].map((bud) => (
-            <g
-              key={`${bud.x}-${bud.y}`}
-              transform={`translate(${bud.x} ${bud.y}) scale(0.6)`}
-            >
-              <circle r="10" fill="#f8a7c3" />
-              <path d="M0 10 Q6 12 9 6 Q6 -1 0 -6 Q-6 -1 -9 6 Q-6 12 0 10 Z" fill="#fdd4e4" />
-            </g>
-          ))}
-        </svg>
-      </button>
-      <div className="flex flex-col gap-10 lg:flex-row lg:items-end">
-        <div className="space-y-6 lg:w-2/3">
-          <p className="text-xs uppercase tracking-[0.7em] text-[var(--muted)]">
-            Gustavo / フルスタック / AI builder
+          <span className="hero-sakura-seal grid h-9 w-9 place-items-center rounded-full border border-white/20 text-sm text-[var(--accent-alt)] transition-transform group-hover:rotate-45">
+            花
+          </span>
+          <span className="hidden sm:block">{copy.hero.sakura}</span>
+        </button>
+      </div>
+
+      <div className="hero-layout relative z-10 mx-auto grid w-full max-w-[1600px] items-center gap-10 lg:grid-cols-[minmax(0,1.25fr)_minmax(260px,0.75fr)] lg:gap-16">
+        <div className="hero-copy max-w-[900px]">
+          <p className="hero-kicker mb-6 flex items-center gap-3 text-[10px] uppercase tracking-[0.5em] text-[var(--accent-alt)] sm:text-[11px]">
+            <span className="h-px w-9 bg-[var(--accent)]" />
+            Gustavo Galeazzi <span className="text-white/25">—</span> Full Stack &amp; AI
           </p>
-          <div
-            className="relative h-80 text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl"
-            onMouseEnter={handleHover}
-            onMouseLeave={handleLeave}
+          <h1
+            className="hero-title relative max-w-[880px] font-semibold tracking-[-0.055em] text-white"
+            lang={language === "jp" ? "ja" : language}
           >
-            <span ref={titlePtRef} className="block text-[var(--foreground)]">{englishTitle}</span>
-            <span ref={titleJpRef} className="pointer-events-none absolute inset-0 text-(--accent)/70" />
+            <span key={language} className="hero-title-language block">
+              {copy.hero.title}
+            </span>
+          </h1>
+
+          <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4">
+            <div className="hero-language flex items-center gap-1 rounded-full border border-white/15 bg-black/25 p-1" role="group" aria-label={copy.hero.languageLabel}>
+              {languageOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  aria-pressed={language === option.id}
+                  onClick={() => setLanguage(option.id)}
+                  className={`rounded-full px-3 py-1.5 font-mono text-[9px] tracking-[0.18em] transition-colors ${language === option.id ? "bg-white text-[#111318]" : "text-white/50 hover:text-white"}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <p className="max-w-[340px] text-xs leading-relaxed text-white/55 sm:text-sm">
+              {copy.hero.subtitle}
+            </p>
+          </div>
+
+          <div className="mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
+            <a href="#projects" className="hero-primary-link group inline-flex items-center gap-5 bg-[var(--accent)] px-5 py-3.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white transition-colors hover:bg-[#ff725a]">
+              {copy.hero.work}
+              <span className="transition-transform duration-300 group-hover:translate-x-1">↗</span>
+            </a>
+            <a href="#about" className="inline-flex items-center gap-3 border border-white/20 px-5 py-3.5 text-[10px] uppercase tracking-[0.2em] text-white/75 transition-colors hover:border-white/50 hover:text-white">
+              {copy.hero.about}
+            </a>
           </div>
         </div>
+
+        <aside className="hero-side relative hidden min-h-[430px] items-end justify-end lg:flex" aria-label="Portfolio signature">
+          <p className="hero-coordinate absolute right-1 top-[20%] font-mono text-[9px] uppercase tracking-[0.3em] text-white/50">
+            35° 00′ 00″ N <span className="mx-2 text-[var(--accent)]">/</span> 139° 00′ 00″ E
+          </p>
+          <p className="hero-japanese-note absolute right-0 top-[34%] text-[11px] tracking-[0.32em] text-white/45 [writing-mode:vertical-rl]">
+            技術と想像力のあいだ
+          </p>
+          <div className="hero-enso absolute bottom-24 right-16 grid h-48 w-48 place-items-center rounded-full border border-white/20" aria-hidden="true">
+            <div className="absolute inset-3 rounded-full border border-[var(--accent-alt)]/45" />
+            <span className="font-serif text-7xl font-light text-white/80">間</span>
+            <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#101116] px-3 font-mono text-[8px] uppercase tracking-[0.3em] text-[var(--accent-alt)]">Ma · negative space</span>
+          </div>
+        </aside>
       </div>
+
+      <div className="hero-footer absolute inset-x-6 bottom-8 z-20 flex items-center gap-4 text-[9px] uppercase tracking-[0.28em] text-white/45 sm:inset-x-10 lg:inset-x-16">
+        <span className="font-mono text-[var(--accent-alt)]">01 <span className="text-white/30">/</span> 04</span>
+        <span className="hero-scroll-rule h-px flex-1 bg-white/15" aria-hidden="true" />
+        <a href="#about" className="group inline-flex items-center gap-3 transition-colors hover:text-white">
+          {copy.hero.scroll}
+          <span className="text-[var(--accent)] transition-transform duration-300 group-hover:translate-y-1">↓</span>
+        </a>
+      </div>
+      {showIntro && (
+        <div className="portfolio-intro fixed inset-0 z-[100] overflow-hidden" aria-label="Portfolio opening animation">
+          <div className="intro-atmosphere absolute inset-0" aria-hidden="true" />
+          <div className="intro-sun absolute left-1/2 top-1/2" aria-hidden="true" />
+          <svg className="intro-enso absolute left-1/2 top-1/2" viewBox="0 0 420 420" fill="none" aria-hidden="true">
+            <path className="intro-enso-path" d="M352 214C352 292 289 354 210 354C130 354 66 290 66 210C66 130 131 66 211 66C271 66 320 102 341 151" />
+            <path className="intro-enso-flourish" d="M335 163C347 177 352 194 352 214" />
+          </svg>
+          <div className="intro-shoji intro-shoji-left absolute inset-y-0 left-0" aria-hidden="true" />
+          <div className="intro-shoji intro-shoji-right absolute inset-y-0 right-0" aria-hidden="true" />
+
+          <div className="intro-lockup absolute left-1/2 top-1/2">
+            <span className="intro-kanji" lang="ja">創</span>
+            <span className="intro-name">GUSTAVO GALEAZZI</span>
+            <span className="intro-rule" aria-hidden="true" />
+            <span className="intro-caption" lang="ja">技術と想像力を、かたちに。</span>
+          </div>
+
+          <p className="intro-side-note intro-side-note-left absolute left-8 top-1/2 hidden sm:block" lang="ja">静かな一歩から、世界へ</p>
+          <p className="intro-side-note intro-side-note-right absolute right-8 top-1/2 hidden sm:block">DIGITAL CRAFT <span>×</span> SÃO PAULO</p>
+          <div className="intro-topline absolute inset-x-6 top-6 flex items-center justify-between sm:inset-x-10 sm:top-8">
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/45">G / 01</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-white/45">{copy.hero.introLabel}</span>
+          </div>
+          <div className="intro-bottomline absolute inset-x-6 bottom-6 flex items-center gap-4 sm:inset-x-10 sm:bottom-8">
+            <span className="font-mono text-[8px] uppercase tracking-[0.25em] text-white/45">{copy.hero.introBottom}</span>
+            <span className="intro-progress h-px flex-1" aria-hidden="true" />
+            <span className="font-mono text-[8px] text-[var(--accent-alt)]">01 / 04</span>
+          </div>
+          <button
+            type="button"
+            onClick={skipIntro}
+            className="intro-skip absolute right-6 top-[4.25rem] z-10 px-2 py-2 font-mono text-[9px] uppercase tracking-[0.2em] text-white/55 transition-colors hover:text-white sm:right-10 sm:top-20"
+          >
+            {copy.hero.skip} <span className="ml-2 text-[var(--accent-alt)]">↗</span>
+          </button>
+          <span className="intro-petal intro-petal-one" aria-hidden="true" />
+          <span className="intro-petal intro-petal-two" aria-hidden="true" />
+          <span className="intro-petal intro-petal-three" aria-hidden="true" />
+        </div>
+      )}
     </section>
   );
 }

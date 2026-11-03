@@ -1,0 +1,242 @@
+/* Shared type roles; photographic expression is reserved for the warm world. */
+:root {
+  --sans: var(--font-archivo), Arial, Helvetica, sans-serif;
+  --serif: var(--font-photographic), Georgia, serif;
+  --mono: var(--font-annotations), monospace;
+  --label-size: 12px;
+  --dev-paper: #eef0f7;
+  --dev-muted: #535e78;
+  --dev-selection: #dce3fa;
+  --photo-paper: #f3eee6;
+  --photo-surface: #f4efe6;
+  --photo-ink: #392b26;
+  --photo-muted: #65574d;
+  --photo-line: #392b2626;
+  --photo-control-line: #392b2666;
+  --photo-placeholder: #e2dbd0;
+  --copper-text: #a4442a;
+  --viewer-bg: #171614;
+}
+
+body { font-optical-sizing: auto; }
+
+.duality .micro {
+  font-size: var(--label-size);
+  line-height: 1.6;
+  letter-spacing: .035em;
+}
+
+.world-header nav,
+.duality .magnetic,
+.duality .line-link,
+.overlay > header button,
+.vision-viewer > header button,
+.index-total > span,
+.index-filters button > span,
+.index-search button,
+.index-preview-cta,
+.photo-grid-loading button,
+.photo-grid-caption small {
+  font-size: var(--label-size);
+  letter-spacing: .025em;
+}
+
+.world-header nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.duality .header-world { white-space: nowrap; }
+.duality .world-header { gap: 32px; }
+.duality .wordmark { font-weight: 800; }
+.duality .world-header .wordmark { margin-right: 12px; }
+.duality .magnetic { gap: 12px; }
+.duality .magnetic .switch-label { white-space: nowrap; }
+
+.select-top { column-gap: 24px; }
+.select-bottom { gap: 20px; }
+.select-manifesto { line-height: 1.8; }
+.photographer-choice strong { letter-spacing: -.035em; }
+
+/* Precise sans-serif weight and scale replace the Developer's serif accents. */
+.world-developer .dev-opening h1 {
+  font-weight: 600;
+  letter-spacing: -.065em;
+  line-height: .88;
+}
+
+.world-developer .dev-opening h1 > span:not(.punctuation) {
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: -.06em;
+}
+
+.world-developer :is(.index-heading h2, .index-empty h3, .about-scene h2, .contact-scene h2) em {
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.world-developer .index-heading h2,
+.world-developer .about-scene h2,
+.world-developer .contact-scene h2 {
+  font-weight: 600;
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+.world-developer .about-signature {
+  font-family: var(--sans);
+  font-style: normal;
+  letter-spacing: -.035em;
+}
+
+.world-developer .index-mobile-image > span {
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.world-developer .index-intro p,
+.world-developer .index-preview-copy p,
+.photo-grid-heading-note p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.index-filters button > span { opacity: 1; }
+.index-row-copy > .micro { letter-spacing: .015em; }
+.index-preview-copy { grid-template-columns: .9fr 1.2fr; }
+.index-list-heading { flex-wrap: wrap; row-gap: 8px; }
+.index-list-heading > span:last-child { margin-left: auto; }
+.index-preview-meta { gap: 18px; }
+.index-total > span { letter-spacing: .035em; }
+
+.duality .contact-scene footer,
+.duality .vision-contact footer,
+.duality .index-art-content .typographic-art .micro {
+  font-size: var(--label-size);
+}
+
+/* A warm paper frame with consistent ink and accessible accent roles. */
+.world-photographer {
+  --atlas-bg: var(--photo-paper);
+  --atlas-ink: var(--photo-ink);
+  --atlas-line: var(--photo-line);
+}
+
+.photography-world {
+  --atlas-bg: var(--photo-paper);
+  --atlas-ink: var(--photo-ink);
+  --atlas-line: var(--photo-line);
+}
+
+.photo-grid-heading h1 {
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+
+.photo-grid-heading h1 em,
+.vision-contact h2 em,
+.vision-viewer > footer h2 {
+  font-optical-sizing: auto;
+  font-weight: 400;
+  letter-spacing: -.025em;
+}
+
+.vision-contact h2 { line-height: 1; letter-spacing: -.045em; }
+.vision-contact > a { line-height: 1.5; overflow-wrap: anywhere; }
+.vision-contact footer { line-height: 1.7; }
+.photo-grid-info { align-items: start; line-height: 1.7; }
+.photo-grid-loading { flex-wrap: wrap; row-gap: 12px; }
+.photo-grid-demo { max-width: 720px; margin-inline: auto; }
+.photo-grid-caption { background: linear-gradient(transparent, #171614ee); }
+.photo-grid-caption > span:first-child { align-items: baseline; line-height: 1.4; }
+.vision-viewer > footer h2 { line-height: 1.2; }
+
+.world-developer ::selection { background: var(--ice); color: var(--navy); }
+.world-photographer ::selection { background: var(--sand); color: var(--photo-ink); }
+
+@media (max-width: 1000px) {
+  .duality .world-header { gap: 20px; }
+  .world-header nav { gap: 20px; }
+  .index-preview-copy { display: block; }
+}
+
+@media (max-width: 700px) {
+  .duality .world-header {
+    gap: 14px;
+    padding-inline: 18px;
+  }
+  .duality .world-header .wordmark { font-size: 26px; }
+  .duality .header-world { max-width: none; letter-spacing: .015em; }
+  .duality .magnetic {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0;
+    gap: 0;
+    justify-content: center;
+  }
+  .duality .magnetic .switch-label,
+  .duality .magnetic > svg { display: none; }
+  .duality .magnetic .dimension-symbol { font-size: 24px; line-height: 1; }
+  .world-header nav { display: none; }
+  .world-developer .hero-kicker { gap: 18px; }
+  .world-developer .hero-kicker > span:first-child { flex: 0 0 145px; }
+  .world-developer .hero-kicker > span:last-child { min-width: 0; }
+  .world-developer .hero-foot { gap: 14px; }
+  .world-developer .hero-foot > span:first-child { max-width: none; white-space: nowrap; }
+  .world-developer .hero-aperture { opacity: .22; }
+  .world-developer .index-heading { display: grid; grid-template-columns: 1fr auto; gap: 26px 16px; align-items: center; }
+  .index-heading > div:first-child { display: contents; }
+  .index-heading > div:first-child > .micro { grid-column: 1; grid-row: 1; }
+  .world-developer .index-heading h2 { grid-column: 1 / -1; grid-row: 2; font-size: 13vw; letter-spacing: -.055em; margin: 0; }
+  .index-intro { grid-column: 2; grid-row: 1; }
+  .index-total { flex-direction: row; align-items: center; font-size: 36px; gap: 10px; }
+  .index-total > span { font-size: 12px; }
+  .index-list-heading { padding-inline: 0; letter-spacing: .01em; }
+  .index-row { gap: 10px; }
+  .index-mobile-image { width: 50px; height: 58px; }
+  .index-row-copy strong { font-size: 26px; }
+  .index-row-copy > .micro { line-height: 1.65; }
+  .index-row-arrow { width: 30px; height: 30px; }
+  .index-preview-copy p { margin-top: 20px; }
+  .world-developer .contact-scene h2 { font-size: 10.7vw; line-height: 1.05; }
+  .world-developer .contact-scene footer { gap: 22px; }
+
+  .photo-grid-heading { display: block; padding-bottom: 24px; }
+  .photo-grid-heading h1 { font-size: 10.8vw; margin-top: 20px; letter-spacing: -.045em; }
+  .photo-grid-heading-note {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 18px;
+    text-align: left;
+    margin-top: 24px;
+  }
+  .photo-grid-heading-note p { display: block; font-size: 14px; text-align: right; margin: 0; }
+  .photo-grid-info { gap: 22px; padding-block: 20px; }
+  .photo-grid-info > span { flex: 1; }
+  .photo-grid-info > span:last-child { max-width: none; }
+  .photo-grid-caption { padding: 36px 12px 12px; }
+  .photo-grid-caption > span:first-child { gap: 6px; }
+  .photo-grid-caption small { font-size: 12px; }
+  .photo-grid-loading { gap: 14px; padding-block: 32px; }
+  .photo-grid-section ~ .vision-contact h2 { font-size: 12.5vw; line-height: 1.08; }
+  .vision-contact footer { gap: 22px; }
+  .vision-viewer > header { gap: 16px; }
+  .vision-viewer > header > .micro { max-width: 65%; }
+}
+
+@media (max-width: 600px) {
+  .select-top { grid-template-columns: 40px 1fr; }
+  .select-top > span:nth-child(2) { justify-self: end; max-width: 235px; }
+  .select-manifesto { max-width: 155px; }
+  .select-bottom { align-items: start; }
+  .select-bottom > span { max-width: 48%; }
+  .duality .choice > .micro:first-child { font-size: 12px; }
+  .choice strong { line-height: 1.3; }
+}

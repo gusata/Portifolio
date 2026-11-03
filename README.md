@@ -1,4 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DUALITY — Gustavo Galeazzi
+
+## Adicionar fotografias sem editar código
+
+Copie suas imagens para **`public/photos/portfolio/`** e atualize a página.
+O site identifica as dimensões, monta o catálogo e desativa o aviso de demonstração
+automaticamente. Aceita JPG, JPEG, PNG, WebP e AVIF.
+
+Exemplo: `01 - Barcos no lago.jpg` aparece como **Barcos no lago**. Use números
+no começo dos nomes para ordenar; subpastas também são aceitas para coleções.
+Todas as fotos entram na galeria em grid, com proporções preservadas e carregamento
+progressivo durante a rolagem. Clique ou toque em uma imagem para ampliar.
+
+Para remover uma imagem, retire o arquivo da pasta. Se ela ficar vazia, o site volta
+às fotos genéricas. No site hospedado, envie os arquivos com o projeto e publique
+uma nova versão. Mais detalhes em [COMO-ADICIONAR.md](public/photos/portfolio/COMO-ADICIONAR.md).
 
 ## Getting Started
 
