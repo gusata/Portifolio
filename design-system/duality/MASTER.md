@@ -7,6 +7,10 @@ motion 9, density 2) matched Minimalism & Swiss Style. Apply its negative space,
 geometric structure, visible focus and reduced-motion final states. The user's
 navy/porcelain, cobalt/ice and copper/sand palettes supersede the generic palette.
 The generic Hero/Features/CTA recommendation is unsuitable for this exhibition.
+The Developer project selector is a restrained four-column editorial table:
+light surface, quiet uppercase headers, large project names and thin row rules.
+Keep the detail overlay's separate visual treatment intact. Fit the table to
+mobile without horizontal scrolling or invented project metadata.
 
 ## Motion
 Framer Motion is already installed; retain Next.js 16 and React 19.
@@ -32,9 +36,12 @@ or third-party component source were copied; no Pro license is assumed.
   motion with preserved accessibility semantics.
 
 ## Content and limits
-Preserve ClaudeFy, LEIA, Bob, Formazzi, Quiet Head and Blitz content and URLs.
-Bob, Quiet Head and Blitz have local product images. Other project artwork must
-remain explicitly identified as visual studies rather than product screenshots.
+The current developer catalog contains LEIA, Formazzi and Blitz. Preserve their
+content and URLs from `content/duality.ts`. Blitz has a local product screenshot;
+LEIA and Formazzi use process studies that must stay explicitly identified as
+diagrams, not product screenshots. Project detail pages can show verified
+technologies and process steps from the content data. Do not invent roles,
+outcomes, dates or client details that are not recorded there.
 No verified authorial photography collection was present in public/. Never use
 the existing generated hero art as evidence of Gustavo's photographic work.
 The photographic exhibition needs original images before final delivery.

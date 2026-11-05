@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${dualitySans.variable} ${annotations.variable} ${photographic.variable}`}>
+    <html lang="pt" className={`${dualitySans.variable} ${annotations.variable} ${photographic.variable}`}>
       <body>{children}</body>
     </html>
   );

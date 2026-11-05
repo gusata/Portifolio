@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useSyncExternalStore, type ReactNode } from "react";
 
 export type Language = "pt" | "en" | "jp";
 
@@ -254,15 +254,43 @@ type LanguageContextValue = {
 };
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
+const LANGUAGE_STORAGE_KEY = "portfolio-language";
+const LANGUAGE_CHANGE_EVENT = "portfolio-language-change";
+let inMemoryLanguage: Language = "pt";
+
+function getLanguageSnapshot(): Language {
+  try {
+    const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (saved === "pt" || saved === "en" || saved === "jp") return saved;
+  } catch {}
+  return inMemoryLanguage;
+}
+
+function getServerLanguageSnapshot(): Language { return "pt"; }
+
+function subscribeToLanguage(listener: () => void) {
+  window.addEventListener("storage", listener);
+  window.addEventListener(LANGUAGE_CHANGE_EVENT, listener);
+  return () => {
+    window.removeEventListener("storage", listener);
+    window.removeEventListener(LANGUAGE_CHANGE_EVENT, listener);
+  };
+}
+
+function updateLanguage(language: Language) {
+  inMemoryLanguage = language;
+  try { window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language); } catch {}
+  window.dispatchEvent(new Event(LANGUAGE_CHANGE_EVENT));
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>("pt");
+  const language = useSyncExternalStore(subscribeToLanguage, getLanguageSnapshot, getServerLanguageSnapshot);
 
   useEffect(() => {
     document.documentElement.lang = language === "jp" ? "ja" : language;
   }, [language]);
 
-  const value = useMemo(() => ({ language, setLanguage, copy: copy[language] }), [language]);
+  const value = useMemo(() => ({ language, setLanguage: updateLanguage, copy: copy[language] }), [language]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }

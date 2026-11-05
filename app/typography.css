@@ -53,6 +53,33 @@ body { font-optical-sizing: auto; }
 .duality .world-header .wordmark { margin-right: 12px; }
 .duality .magnetic { gap: 12px; }
 .duality .magnetic .switch-label { white-space: nowrap; }
+.language-switch {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid currentColor;
+  border-color: color-mix(in srgb, currentColor 38%, transparent);
+  border-radius: 999px;
+}
+.language-switch button {
+  display: grid;
+  min-width: 38px;
+  min-height: 38px;
+  place-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: 10px var(--mono);
+  letter-spacing: .04em;
+  transition: background-color .2s ease, color .2s ease;
+}
+.world-developer .language-switch { --language-active-bg: var(--ice); --language-active-ink: var(--deep); }
+.world-photographer .language-switch { --language-active-bg: var(--sand); --language-active-ink: var(--umber); }
+.language-switch button[aria-pressed="true"] { background: var(--language-active-bg); color: var(--language-active-ink); }
+.language-switch button:focus-visible { outline-offset: 2px; }
 
 .select-top { column-gap: 24px; }
 .select-bottom { gap: 20px; }
@@ -172,6 +199,10 @@ body { font-optical-sizing: auto; }
   }
   .duality .world-header .wordmark { font-size: 26px; }
   .duality .header-world { max-width: none; letter-spacing: .015em; }
+  .duality .header-world { display: none; }
+  .language-switch { margin-left: auto; }
+  .language-switch button { min-width: 44px; min-height: 44px; }
+  .duality .magnetic { margin-left: 0; }
   .duality .magnetic {
     width: 44px;
     height: 44px;

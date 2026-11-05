@@ -1,9 +1,11 @@
 # Developer portfolio scalability research
 
 User requested analysis of creative portfolios with large project catalogs. This
-file records research; application components were not changed during this task.
+file records the research snapshot; application components were not changed
+during that research. Project content has changed since then: the current index
+contains LEIA, Formazzi and Blitz.
 
-## Current implementation
+## Implementation at time of research
 
 At 1620x990, the Developer document measured 10,004px tall. Its six .exhibit
 sections measured approximately 1,115px each (Quiet Head: 1,113px). ProjectScene
@@ -48,12 +50,13 @@ gets direct tap-to-open rows with small previews, avoiding a two-tap dependency.
 Use cobalt, ice, expressive typography and rounded preview surfaces to retain
 the Developer world's identity. No conventional repetitive card wall is required.
 
-All six current records belong in the index from day one. At larger catalog sizes,
-add meaningful category filters and search rather than additional cinematic
-sections. At most two curated highlights could precede the full index if there is
-strong real product imagery. Keep details and future case studies on demand.
-Do not add pagination or virtualization for six records. For much larger datasets,
-evaluate those against actual load and navigation requirements.
+All six records present during research belonged in the index from day one. The
+implemented index now uses the three records in the current content file. At
+larger catalog sizes, add meaningful category filters and search rather than
+additional cinematic sections. At most two curated highlights could precede the
+full index if there is strong real product imagery. Keep details and future case
+studies on demand. Do not add pagination or virtualization for the current
+catalog; evaluate those only if actual size and navigation needs justify them.
 
 ## Skill findings
 
