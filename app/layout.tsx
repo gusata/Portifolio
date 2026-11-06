@@ -7,6 +7,7 @@ import "./photography-room.css";
 import "./photography-grid.css";
 import "./typography.css";
 import "./motion.css";
+import "./photo-card.css";
 
 const dualitySans = localFont({
   src: "../public/fonts/archivo-latin.woff2",
