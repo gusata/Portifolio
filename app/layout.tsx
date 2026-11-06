@@ -3,10 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "./developer.css";
 import "./photography.css";
-import "./photography-editorial.css";
 import "./photography-room.css";
 import "./photography-grid.css";
 import "./typography.css";
+import "./motion.css";
 
 const dualitySans = localFont({
   src: "../public/fonts/archivo-latin.woff2",

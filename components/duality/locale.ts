@@ -77,7 +77,6 @@ export const dualityCopy = {
       start: "VAMOS CRIAR",
       end: "ALGO NOVO.",
       motto: "DOIS UNIVERSOS. UMA MENTE CRIATIVA.",
-      credits: "COMPONENTES POR SKIPER UI",
       backToTop: "VOLTAR AO TOPO",
     },
     photography: {
@@ -182,7 +181,6 @@ export const dualityCopy = {
       start: "LET’S BUILD",
       end: "SOMETHING NEW.",
       motto: "TWO WORLDS. ONE CREATIVE MIND.",
-      credits: "COMPONENTS BY SKIPER UI",
       backToTop: "BACK TO TOP",
     },
     photography: {

@@ -10,6 +10,7 @@ import PhotographyWorld from "./PhotographyWorld";
 import ProjectIndex from "./ProjectIndex";
 import { PhotographyProvider, usePhotography, type PhotographyLibrary } from "./PhotographyProvider";
 import { dualityCopy } from "./locale";
+import { MaskLines, ScrubWords } from "./motion";
 
 type World = "select" | "developer" | "photographer";
 const ease = [.76, 0, .24, 1] as const;
@@ -29,6 +30,9 @@ function Intro({ finish }: { finish: () => void }) {
     <p className="micro intro-caption">{copy.intro.caption}</p><button className="intro-skip micro" onClick={finish}>{copy.intro.skip} <Arrow /></button>
   </motion.div>;
 }
+function Roll({ text }: { text: string }) {
+  return <><span className="sr-only">{text}</span><span className="roll" aria-hidden="true">{[...text].map((char, i) => <span key={i} style={{ "--i": i } as CSSProperties}>{char}</span>)}</span></>;
+}
 function Selector({ enter }: { enter: (w: World) => void }) {
   const { photographs } = usePhotography();
   const { language } = useLanguage();
@@ -46,7 +50,7 @@ function Selector({ enter }: { enter: (w: World) => void }) {
     <div className="selection-name" aria-hidden="true"><span>GUSTAVO</span><span>GALEAZZI<span className="name-dot">.</span></span></div>
     <motion.div className="selector-object object-code" style={{ x: reduced ? 0 : sx, y: reduced ? 0 : sy }}><Aperture architectural /></motion.div><motion.div className="selector-object object-frame" style={{ x: reduced ? 0 : sx, y: reduced ? 0 : sy }}>{photographs[0] && <Image src={photographs[0].src} alt="" fill sizes="(max-width:600px) 35vw, 25vw" className="selector-demo-photo" />}<Aperture /></motion.div>
     <p className="select-manifesto micro">{copy.selector.manifesto.split("\n").map((line, index) => <span key={line}>{index > 0 && <br />}{line}</span>)}</p>
-    <div className="world-choices">{(["developer", "photographer"] as const).map((w, i) => <button key={w} onPointerEnter={() => focus(w)} onFocus={() => focus(w)} onBlur={() => focus("select")} onClick={() => enter(w)} className={`choice ${w}-choice`}><span className="micro">{number(i)} / {i ? copy.selector.photographerKicker : copy.selector.developerKicker}</span><strong>{i ? copy.selector.photographer : copy.selector.developer}</strong><span className="choice-action micro">{copy.selector.enter} <Arrow /></span></button>)}</div>
+    <div className="world-choices">{(["developer", "photographer"] as const).map((w, i) => <button key={w} onPointerEnter={() => focus(w)} onFocus={() => focus(w)} onBlur={() => focus("select")} onClick={() => enter(w)} className={`choice ${w}-choice`}><span className="micro">{i ? copy.selector.photographerKicker : copy.selector.developerKicker}</span><strong><Roll text={i ? copy.selector.photographer : copy.selector.developer} /></strong><span className="choice-action micro">{copy.selector.enter} <Arrow /></span></button>)}</div>
     <footer className="select-bottom micro"><span>{copy.selector.footer}</span><span>{copy.selector.choose} ↙ ↘</span><span>{copy.selector.disciplines}</span></footer>
   </main>;
 }
@@ -57,9 +61,11 @@ function Magnetic({ children, onClick, label }: { children: ReactNode; onClick: 
 }
 function Navigation({ world, enter }: { world: World; enter: (w: World) => void }) {
   const { language, setLanguage } = useLanguage();
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: .4 });
   const copy = dualityCopy[language === "en" ? "en" : "pt"];
   const activeLanguage = language === "en" ? "en" : "pt";
-  return <header className="world-header"><button className="wordmark" onClick={() => enter("select")} aria-label={copy.nav.return}>GG<span>®</span></button><span className="header-world micro">{world === "developer" ? copy.nav.developer : copy.nav.photographer}</span><nav aria-label={language === "en" ? "Page sections" : "Seções da página"}><a href="#work">{copy.nav.work}</a><a href="#contact">{copy.nav.contact}</a></nav><div className="language-switch" role="group" aria-label={copy.languageLabel}>{(["pt", "en"] as const).map(option => <button key={option} type="button" aria-pressed={activeLanguage === option} onClick={() => setLanguage(option)}>{option.toUpperCase()}</button>)}</div><Magnetic onClick={() => enter(world === "developer" ? "photographer" : "developer")} label={world === "developer" ? copy.nav.switchToPhotographer : copy.nav.switchToDeveloper}><span className="dimension-symbol" aria-hidden="true">◈</span><span className="switch-label">{copy.nav.switchWorld}</span><Arrow /></Magnetic></header>;
+  return <header className="world-header"><button className="wordmark" onClick={() => enter("select")} aria-label={copy.nav.return}>GG<span>®</span></button><span className="header-world micro">{world === "developer" ? copy.nav.developer : copy.nav.photographer}</span><nav aria-label={language === "en" ? "Page sections" : "Seções da página"}><a href="#work">{copy.nav.work}</a><a href="#contact">{copy.nav.contact}</a></nav><div className="language-switch" role="group" aria-label={copy.languageLabel}>{(["pt", "en"] as const).map(option => <button key={option} type="button" aria-pressed={activeLanguage === option} onClick={() => setLanguage(option)}>{option.toUpperCase()}</button>)}</div><Magnetic onClick={() => enter(world === "developer" ? "photographer" : "developer")} label={world === "developer" ? copy.nav.switchToPhotographer : copy.nav.switchToDeveloper}><span className="dimension-symbol" aria-hidden="true">◈</span><span className="switch-label">{copy.nav.switchWorld}</span><Arrow /></Magnetic><motion.span className="scroll-progress" aria-hidden="true" style={{ scaleX: progress }} /></header>;
 }
 function Artwork({ project, index }: { project: Project; index: number }) {
   const { language } = useLanguage();
@@ -88,7 +94,7 @@ function ProjectCaseStudy({ project, index, onNext }: { project: Project; index:
   const flow = language === "en" ? project.flow ?? [] : project.flowPt ?? project.flow ?? [];
   return <article className="case-study">
     <div className="case-study-kicker micro"><span>{copy.caseStudy.selectedWork} / {number(index)}</span><span>{discipline}</span></div>
-    <div className="case-study-intro"><h2>{project.name}</h2><p>{description}</p></div>
+    <div className="case-study-intro"><MaskLines key={project.name} lines={[project.name]} label={project.name} onMount delay={.3} /><motion.p key={`d-${project.name}`} initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .9, delay: .45, ease: [.16, 1, .3, 1] }}>{description}</motion.p></div>
     <figure className="case-study-figure">
       <motion.div className="case-study-art" layoutId={`art-${index}`}><Artwork project={project} index={index} /></motion.div>
       <figcaption className="case-study-caption micro"><span>{project.image ? (language === "en" ? project.imageCaption ?? copy.caseStudy.productScreen : project.imageCaptionPt ?? copy.caseStudy.productScreen) : copy.caseStudy.processStudy}</span><span>{number(index)} / {String(projects.length).padStart(2, "0")}</span></figcaption>
@@ -133,7 +139,7 @@ function Developer() {
   const ref = useRef<HTMLElement>(null), reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, 180]), rotate = useTransform(scrollYProgress, [0, 1], [0, 35]);
-  return <><section ref={ref} className="dev-opening"><div className="hero-kicker micro"><span>{copy.developer.kicker}</span><span>{copy.developer.world}</span></div><motion.h1 style={{ y: reduced ? 0 : y }}>{copy.developer.titleStart}<br /><span>{copy.developer.titleMiddle}</span><br />{copy.developer.titleEnd}<span className="punctuation">.</span></motion.h1><motion.div className="hero-aperture" style={{ rotate: reduced ? 0 : rotate }}><Aperture architectural /></motion.div><div className="hero-foot micro"><span>GUSTAVO GALEAZZI</span><a href="#work">{copy.developer.scroll} ↓</a><span>{copy.developer.discipline}</span></div></section><ProjectIndex open={setSelected} /><section className="about-scene"><span className="micro">{copy.developer.aboutEyebrow}</span><h2>{copy.developer.aboutStart}<br /><em>{copy.developer.aboutEnd}</em></h2><p>{copy.developer.about}</p><span className="about-signature">Gustavo Galeazzi</span></section><Contact photo={false} /><AnimatePresence>{selected !== null && <Overlay title={`${number(selected)} / ${projects[selected].name}`} close={close}><ProjectCaseStudy project={projects[selected]} index={selected} onNext={() => setSelected(index => ((index ?? 0) + 1) % projects.length)} /></Overlay>}</AnimatePresence></>;
+  return <><section ref={ref} className="dev-opening"><div className="hero-kicker micro"><span>{copy.developer.kicker}</span><span>{copy.developer.world}</span></div><motion.div className="hero-title" style={{ y: reduced ? 0 : y }}><MaskLines as="h1" onMount delay={.35} stagger={.11} label={`${copy.developer.titleStart} ${copy.developer.titleMiddle} ${copy.developer.titleEnd}.`} lines={[copy.developer.titleStart, <span className="hero-accent" key="accent">{copy.developer.titleMiddle}</span>, <>{copy.developer.titleEnd}<span className="punctuation">.</span></>]} /></motion.div><motion.div className="hero-aperture" style={{ rotate: reduced ? 0 : rotate }}><Aperture architectural /></motion.div><div className="hero-foot micro"><span>GUSTAVO GALEAZZI</span><a href="#work">{copy.developer.scroll} ↓</a><span>{copy.developer.discipline}</span></div></section><ProjectIndex open={setSelected} /><section className="about-scene"><span className="micro">{copy.developer.aboutEyebrow}</span><MaskLines label={`${copy.developer.aboutStart} ${copy.developer.aboutEnd}`} lines={[copy.developer.aboutStart, <em key="end">{copy.developer.aboutEnd}</em>]} /><ScrubWords text={copy.developer.about} /><span className="about-signature">Gustavo Galeazzi</span></section><Contact photo={false} /><AnimatePresence>{selected !== null && <Overlay title={`${number(selected)} / ${projects[selected].name}`} close={close}><ProjectCaseStudy project={projects[selected]} index={selected} onNext={() => setSelected(index => ((index ?? 0) + 1) % projects.length)} /></Overlay>}</AnimatePresence></>;
 }
 function Contact({ photo }: { photo: boolean }) {
   const { language } = useLanguage();
@@ -141,7 +147,7 @@ function Contact({ photo }: { photo: boolean }) {
   const eyebrow = photo ? `02 — ${copy.photography.contactEyebrow}` : copy.contact.eyebrow;
   const headingStart = photo ? copy.photography.contactStart : copy.contact.start;
   const headingEnd = photo ? copy.photography.contactEnd : copy.contact.end;
-  return <section className="contact-scene" id="contact"><span className="micro">{eyebrow}</span><h2>{headingStart}<br /><em>{headingEnd}</em></h2><a className="contact-link" href="mailto:gustavosgaleazzi@gmail.com">gustavosgaleazzi@gmail.com<Arrow /></a><footer className="micro"><span>GUSTAVO GALEAZZI</span><span>{copy.contact.motto}</span><a href="https://skiper-ui.com" target="_blank" rel="noreferrer">{copy.contact.credits}</a><a href="#top">{copy.contact.backToTop} ↑</a></footer></section>;
+  return <section className="contact-scene" id="contact"><span className="micro">{eyebrow}</span><MaskLines label={`${headingStart} ${headingEnd}`} lines={[headingStart, <em key="end">{headingEnd}</em>]} /><a className="contact-link" href="mailto:gustavosgaleazzi@gmail.com">gustavosgaleazzi@gmail.com<Arrow /></a><footer className="micro"><span>GUSTAVO GALEAZZI</span><span>{copy.contact.motto}</span><a href="#top">{copy.contact.backToTop} ↑</a></footer></section>;
 }
 function Cursor() {
   const { language } = useLanguage();

@@ -1,0 +1,10 @@
+<html><body style="margin:0;overflow:hidden"><iframe id="f" style="border:0;display:block"></iframe>
+<script>
+const q=new URLSearchParams(location.search);const w=+q.get('w')||1440,h=+q.get('h')||900;
+f.style.width=w+'px';f.style.height=h+'px';f.src=q.get('src');
+f.onload=()=>{const W=f.contentWindow,D=f.contentDocument;try{W.sessionStorage.setItem('duality-v2-intro','seen')}catch(e){}
+ setTimeout(()=>{const sel=q.get('scroll');if(sel){const el=D.querySelector(sel);if(el)W.scrollTo(0,el.getBoundingClientRect().top+W.scrollY-(+q.get('off')||0))}
+  setTimeout(()=>{const hv=q.get('hover');if(hv!==null){const tr=D.querySelectorAll('.project-table tbody tr')[+hv];const r=tr.getBoundingClientRect();const x=+q.get('hx')||260,y=r.top+r.height/2;
+   for(let k=0;k<12;k++)W.dispatchEvent(new W.PointerEvent('pointermove',{clientX:x-60+k*5,clientY:y,pointerType:'mouse',bubbles:true}));
+   tr.dispatchEvent(new W.PointerEvent('pointerover',{clientX:x,clientY:y,pointerType:'mouse',bubbles:true}));}},+q.get('t2')||1500)},+q.get('t1')||2500)};
+</script></body></html>
